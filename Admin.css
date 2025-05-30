@@ -1,0 +1,676 @@
+/* Admin.css */
+
+/* General Page Layout */
+.admin-main {
+  padding: 20px;
+  max-width: 1300px; /* Slightly wider to accommodate side-by-side layout */
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Light background for the whole page */
+  min-height: 100vh;
+}
+
+.navigation {
+  margin-bottom: 20px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #007bff;
+}
+
+/* Content Layout: Creator Card (Left) and Preview Card (Right) */
+.admin-content {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 20px;
+}
+
+.creator-card {
+  flex: 1; /* Takes up available space */
+  min-width: 380px; /* Minimum width before wrapping */
+  max-width: 480px; /* Max width to keep form manageable */
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  height: calc(100vh - 100px); /* Adjust based on header/footer height */
+  overflow-y: auto; /* Scrollable if content exceeds height */
+  box-sizing: border-box;
+}
+
+.preview-card {
+  flex: 2; /* Takes up more space, good for preview */
+  min-width: 400px; /* Minimum width for preview */
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the preview area */
+  justify-content: center; /* Center the preview area */
+  height: calc(100vh - 100px); /* Match creator card height */
+  box-sizing: border-box;
+}
+
+/* Preview Area Styling */
+.preview-area {
+  position: relative; /* For absolute positioning of text and add button */
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  overflow: hidden; /* Clip overflowing text elements if necessary */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  /* Default checkered background when no image */
+  background-color: #f8f9fa;
+  background-image:
+    linear-gradient(45deg, #e9ecef 25%, transparent 25%),
+    linear-gradient(-45deg, #e9ecef 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e9ecef 75%),
+    linear-gradient(-45deg, transparent 75%, #e9ecef 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.preview-area.has-image {
+  background-image: none; /* Remove checkered background */
+  background-color: transparent; /* Or a subtle solid color, or transparent if image has own bg */
+  border-style: solid; /* Solid border when image is present */
+  border-color: transparent;
+}
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Context for absolute positioned text elements */
+}
+
+.preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ensures image fits and maintains aspect ratio */
+   /*box-shadow: 0 2px 4px rgba(0,0,0,0.1); Subtle shadow on the image */
+}
+
+.preview-placeholder {
+  color: #6c757d;
+  text-align: center;
+  font-size: 16px;
+  padding: 20px;
+}
+
+/* Text Elements on Preview */
+.text-element {
+  padding: 3px 5px;
+   box-sizing: border-box;
+  /*position: absolute; 
+  word-break: break-word;
+  cursor: move;
+  transition: outline 0.1s ease-in-out, border 0.1s ease-in-out;
+  user-select: none;
+  line-height: 1.2; */
+}
+
+.text-element.active { 
+  /* Default active state: selected but not inline editing */
+   /* Darker, thinner dashed outline */
+   outline: 1px dashed #007bff;
+  outline-offset: 1px; /* Space between element and outline */
+  z-index: 10;
+}
+
+.text-element.inline-editing-active {
+  /* Special active state: when inline editing */
+ /* Blue dashed outline */
+ 
+  cursor: text; /* Change cursor to text input */
+  z-index: 11; /* Ensure textarea is above other elements */
+}
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #007bff;
+  border: 1px solid white;
+  border-radius: 50%; /* Make it a circle */
+  z-index: 15; /* Above the text element content */
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.resize-handle:hover {
+  opacity: 1;
+}
+
+.resize-handle-se { /* South-East handle */
+  bottom: -5px; /* Position slightly outside */
+  right: -5px;
+  cursor: nwse-resize;
+}
+
+
+.text-element:hover {
+  outline: 1px dashed #adb5bd;
+  outline-offset: 1.2px;
+}
+
+
+/* Textarea for inline editing */
+.text-element textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent; /* So underlying text isn't visible if colors clash */
+  border: none; 
+  outline: none;
+  color: inherit; /* Inherit from parent .text-element's color style */
+  font-family: inherit; /* Inherit font family */
+  font-size: inherit; /* CRITICAL: inherits scaled font size from parent */
+  line-height: inherit; /* Inherit line height from parent */
+  padding: 0; /* No extra padding inside textarea, parent has padding */
+  margin: 0;
+  box-sizing: border-box; /* Textarea itself should be content-box to match width */
+  position: absolute; /* Fill the parent text-element div */
+  top: 0;
+  left: 0;
+  resize: none; /* Disable manual resize handle */
+  white-space: pre-wrap; /* Respect newlines and wrap text */
+  word-break: break-word; /* Break words to fit width */
+  overflow-y: auto; /* Allow scroll if content exceeds height during typing */
+  /* Ensure textarea is visually distinct when focused within an inline-editing text element */
+}
+
+ .text-element.inline-editing-active textarea {
+  padding-bottom: 1px;
+  
+  /* background-color: rgba(255, 255, 255, 0.8); */
+ 
+}
+
+.text-element {
+  position: absolute;
+  padding: 5px 5px; 
+  word-break: break-word;
+  box-sizing: border-box; 
+  /* cursor set dynamically by JS via inline style */
+  transition: outline 0.1s ease-in-out; /* Smooth outline transition */
+  user-select: none; /* Default to no text selection on the div */
+  line-height: 1.2; 
+  /* NO OUTLINE BY DEFAULT */
+  outline: none; 
+}
+
+/* STATE 1: Selected for dragging (active, but not inline editing) */
+.text-element.active { 
+  /* Outline for dragging */
+  outline-offset: 2px; /* Slightly more offset */
+  z-index: 10;
+  /* cursor: move !important; is set via inline style now */
+}
+
+/* STATE 2: Inline Editing Active */
+.text-element.inline-editing-active {
+  outline: none !important; /* Different outline for editing */
+  
+  /* cursor: text !important; is set via inline style now */
+  z-index: 11;
+  /* Ensure the div itself doesn't show its original content if textarea is on top */
+  /* Hide original text if textarea doesn't fully cover */
+}
+
+ /*.text-element:hover:not(.active):not(.inline-editing-active) {
+  Optional: subtle hover outline if desired when not selected */
+  /* outline: 1px dashed #adb5bd; */
+  /* outline-offset: 2px;  
+}*/
+
+
+/* Textarea for inline editing */
+.text-element textarea {
+  width: 90%;
+  height: 90%; 
+ 
+  border: 1px soild #007bff; 
+  border-radius: 3px;
+  outline: none;
+  color: #212529;
+  font-family: inherit; 
+  font-size: inherit; 
+
+   line-height: 1.2; /* Or even 1.1 for a tighter fit, experiment */
+  padding-top: 1px;    /* Minimal top padding */
+  padding-bottom: 1px; /* Minimal bottom padding */
+  padding-left: 3px;   /* Keep some horizontal padding */
+  padding-right: 3px;
+
+
+  
+  margin: 0;
+  box-sizing: border-box; 
+  position: absolute; 
+  top: 0;
+  left: 0;
+  resize: none; 
+  white-space: pre-wrap; 
+  word-break: break-word; 
+  overflow-y: hidden; 
+  z-index: 12;
+  caret-color: #007bff;
+}
+.text-element textarea::selection{
+  background-color: rgba(0, 123, 255, 0.2);
+  color:#212529;
+
+}
+.text-element textarea::-moz-selection{
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #212529;
+}
+
+
+
+
+/* Add Text Button on Preview */
+.add-text-button {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50px; /* Circular */
+  font-size: 18px; /* Icon size */
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.2s, transform 0.1s;
+  z-index: 20; /* On top */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.add-text-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+.add-text-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+
+/* Form Elements in Creator Card */
+.creator-header {
+  margin-bottom: 25px;
+  text-align: left;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+.creator-header h2 {
+  color: #343a40;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-input,
+.form-input.url-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.image-source-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.image-source-container .url-input {
+  flex-grow: 1;
+}
+
+.file-upload-wrapper {
+  position: relative; /* For absolute positioning of input */
+}
+.file-upload-input { /* Hidden actual file input */
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+}
+.file-upload-button {
+  padding: 10px 15px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+.file-upload-button:hover {
+  background-color: #5a6268;
+}
+.file-upload-button:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+
+/* Text Elements Controls Panel (in Creator Card) */
+.text-elements-controls {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+.text-elements-controls h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #343a40;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.no-texts-message {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.text-control-panel {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.text-control-panel.active-panel { /* When its properties are open */
+  border-color: #007bff;
+  box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.25);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent; /* Default */
+}
+.text-control-panel.active-panel .panel-header {
+  border-bottom-color: #dee2e6; /* Border when panel body is visible */
+}
+
+.panel-header span { /* Text snippet */
+  font-weight: 500;
+  color: #212529;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.panel-actions .delete-text-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 16px;
+  line-height: 1; /* Align icon better */
+  transition: color 0.2s ease;
+}
+.panel-actions .delete-text-btn:hover {
+  color: #c82333;
+}
+
+.panel-body {
+  padding: 15px;
+  /* border-top: 1px solid #dee2e6; Only needed if header doesn't have bottom border when active */
+}
+
+.property-control {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+.property-control:last-child {
+  margin-bottom: 0;
+}
+
+.property-control label {
+  font-size: 13px;
+  color: #495057;
+  min-width: 70px; /* Align labels */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px; /* Space between icon and text */
+}
+.property-control label svg { /* Icon styling */
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.property-control input[type="color"] {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-appearance: none; /* Remove default system appearance */
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent; /* Important for custom color picker */
+}
+/* Custom styling for color input to show selected color */
+.property-control input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.property-control input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+.property-control input[type="color"]::-moz-color-swatch { /* Firefox */
+  border: none;
+  border-radius: 3px;
+}
+
+
+.property-control input[type="range"] {
+  flex-grow: 1;
+  height: 6px;
+  cursor: pointer;
+  background: #dee2e6;
+  border-radius: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.property-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -5px; /* Center thumb on track */
+}
+.property-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.property-control span { /* For displaying range value */
+  font-size: 13px;
+  color: #6c757d;
+  min-width: 40px;
+  text-align: right;
+}
+
+
+/* Upload Guidelines */
+.upload-guidelines {
+  margin: 25px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.guidelines-title {
+  margin: 0 0 10px 0;
+  color: #343a40;
+  font-size: 15px;
+  font-weight: 600;
+}
+.guideline-section {
+  margin-bottom: 10px;
+}
+.guideline-section:last-child {
+  margin-bottom: 0;
+}
+.guideline-subtitle {
+  margin: 5px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+}
+.guideline-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+
+/* Submit Button */
+.submit-button {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: #28a745; /* Green for create/update */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.submit-button:hover {
+  background-color: #218838;
+}
+.submit-button:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) { /* Tablet and smaller */
+  .admin-content {
+    flex-direction: column;
+  }
+  .creator-card, .preview-card {
+    max-width: 100%; /* Allow full width when stacked */
+    height: auto; /* Auto height when stacked */
+    min-height: 400px; /* Ensure decent height */
+  }
+  .preview-card {
+    order: -1; /* Show preview on top when stacked */
+  }
+}
+
+@media (max-width: 576px) { /* Mobile */
+  .admin-main {
+    padding: 15px;
+  }
+  .creator-card, .preview-card {
+    padding: 20px;
+  }
+  .form-input, .file-upload-button, .submit-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+  .add-text-button {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    bottom: 10px;
+    right: 10px;
+  }
+  .property-control {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  .property-control label {
+    min-width: auto; /* Allow label to take natural width */
+    margin-bottom: 3px;
+  }
+  .property-control input[type="range"] {
+    width: 100%; /* Full width for range on mobile */
+  }
+  .property-control span {
+    align-self: flex-end; /* Align unit to the right */
+  }
+  .creator-header h2, .text-elements-controls h4, .guidelines-title {
+    font-size: 18px; /* Adjust header sizes */
+  }
+}
