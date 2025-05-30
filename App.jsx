@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 
-
+import './index.css';
 import Admin from './Admin.jsx'; // This is for poster CREATION
 
 import PosterEditPage from './PosterEditPage.jsx';
